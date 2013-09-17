@@ -4,7 +4,7 @@
 	Python bindings for Solera DeepSee forensics tool
 """
 
-import requests,sys,math,pprint
+import requests,sys,math,pprint,time
 from datetime import datetime, timedelta
 
 class PyDeepSee:
@@ -53,7 +53,7 @@ class PyDeepSee:
 	def startLast15min(self):
 		end = datetime.now()
 		start = end-timedelta(minutes=15)
-		report = 'Application'
+		report = 'application_id'
 		return self.startReport(start,end,report)
 
 	"""
@@ -74,6 +74,23 @@ class PyDeepSee:
 		else:
 			return False
 
+	"""
+		Waits for a report to be done.
+		Blocks, then returns True
+	"""
+	def reportWaitDone(self,reportID):
+		while self.reportDone(reportID) == False:
+			print "not done"
+			print self.reportStatus(reportID)['percentage']
+			time.sleep(1)
+		return True
+			
+	"""
+		Return all reports
+	"""
+	def reportList(self):
+		r = self.solRequest('deepsee-report-list.json')
+		return r
 
 	"""
 		Return raw report results
@@ -85,7 +102,14 @@ class PyDeepSee:
 		r = self.solRequest('deepsee-report-results.json?report_id='+str(reportID)+'&page='+str(pages)+'&pageSize='+str(pageSize))
 		return r
 
-		
+	"""
+		Delete a given report
+	"""
+	def reportDelete(self,reportID):
+		r = self.solRequest('deepsee-report-delete.json?report_id='+str(reportID))		
+		return r
+
+
 	"""
 		Returns raw interfaces
 	"""
