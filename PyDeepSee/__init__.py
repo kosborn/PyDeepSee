@@ -42,19 +42,9 @@ class PyDeepSee:
 		Initiate a report
 		Returns the report_id
 	"""
-	def startReport(self,start,end,report,searchFilter=''):
+	def startReport(self,start,end=datetime.now(),report='application_id',searchFilter=''):
 		r = self.solRequest('deepsee-report-start.json?path=/timespan/'+start.isoformat()+'_'+end.isoformat()+'/'+searchFilter+'&field='+report)
 		return r
-
-	"""
-		Here is where our report information is at
-	"""
-
-	def startLast15min(self):
-		end = datetime.now()
-		start = end-timedelta(minutes=15)
-		report = 'application_id'
-		return self.startReport(start,end,report)
 
 	"""
 		Return raw report status
@@ -129,5 +119,13 @@ class PyDeepSee:
 				activeList.append(interface)
 		return activeList
 
-
-
+	
+	"""
+		Start a report for the last XX minutes.
+		Defaults to 5
+	"""
+	def startLastXmin(self,lastMinutes=5,searchFilter=''):
+		start = datetime.now()-timedelta(minutes=lastMinutes)
+		report = 'application_id'
+		return self.startReport(start,report=report,searchFilter=searchFilter)
+		
